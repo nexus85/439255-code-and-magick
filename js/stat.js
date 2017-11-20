@@ -1,81 +1,111 @@
 'use strict';
 
-window.renderStatistics = function (ctx, names, times) {
-  var workingAreaPoints = [100, 10, 520, 280];
-  (function renderBackground() {
-    var initialX = workingAreaPoints[0];
-    var initialY = workingAreaPoints[1];
-    var backgroundHeight = workingAreaPoints[3] - workingAreaPoints[1];
-    var backgroundWidth = workingAreaPoints[2] - workingAreaPoints[0];
-    var shadowOffset = 10;
-    var shadowColor = 'rgba(0, 0, 0, 0.7)';
-    var scrollWoodHeight = 5;
-    var scrollWoodWidth = 40;
-    var scrollPaperHeight = backgroundHeight - scrollWoodHeight * 2;
-    var scrollPaperWidth = 60;
-    var listColor = 'rgba(255, 255, 255, 1)';
-    var paperColor = ctx.createLinearGradient(initialX, initialY, initialX + scrollPaperWidth, initialY);
-    paperColor.addColorStop(0, 'gray');
-    paperColor.addColorStop(0.3, 'rgba(255, 255, 255, 1)');
-    paperColor.addColorStop(0.35, 'rgba(255, 255, 255, 1)');
-    paperColor.addColorStop(0.8, 'gray');
-    paperColor.addColorStop(1, 'black');
-    var woodColor = ctx.createLinearGradient((initialX + (scrollPaperWidth - scrollWoodWidth) / 2), initialY, (initialX + scrollWoodWidth + (scrollPaperWidth - scrollWoodWidth) / 2), initialY);
-    woodColor.addColorStop(0, 'rgba(77, 31, 6, 1)');
-    woodColor.addColorStop(0.35, 'rgba(140, 52, 19, 1)');
-    woodColor.addColorStop(0.4, 'rgba(140, 52, 19, 1)');
-    woodColor.addColorStop(1, 'rgba(77, 31, 6, 1)');
-    workingAreaPoints = [(initialX + scrollPaperWidth), (initialY + scrollWoodHeight), (initialX + backgroundWidth), (initialY + backgroundHeight)];
-
-    ctx.fillStyle = shadowColor;
-    ctx.fillRect((initialX + shadowOffset), (initialY + scrollWoodHeight + shadowOffset), backgroundWidth, scrollPaperHeight);
-    ctx.fillRect((initialX + (scrollPaperWidth - scrollWoodWidth) / 2 + shadowOffset), (initialY + scrollPaperHeight + scrollWoodHeight + shadowOffset), scrollWoodWidth, scrollWoodHeight);
-
-    ctx.fillStyle = woodColor;
-    ctx.strokeRect((initialX + (scrollPaperWidth - scrollWoodWidth) / 2), initialY, scrollWoodWidth, scrollWoodHeight);
-    ctx.strokeRect((initialX + (scrollPaperWidth - scrollWoodWidth) / 2), (initialY + scrollPaperHeight + scrollWoodHeight), scrollWoodWidth, scrollWoodHeight);
-    ctx.fillRect((initialX + (scrollPaperWidth - scrollWoodWidth) / 2), initialY, scrollWoodWidth, scrollWoodHeight);
-    ctx.fillRect((initialX + (scrollPaperWidth - scrollWoodWidth) / 2), (initialY + scrollPaperHeight + scrollWoodHeight), scrollWoodWidth, scrollWoodHeight);
-
-    ctx.fillStyle = paperColor;
-    ctx.strokeRect(initialX, (initialY + scrollWoodHeight), backgroundWidth, scrollPaperHeight);
-    ctx.fillRect(initialX, (initialY + scrollWoodHeight), scrollPaperWidth, scrollPaperHeight);
-    ctx.fillStyle = listColor;
-    ctx.fillRect(initialX + scrollPaperWidth, (initialY + scrollWoodHeight), backgroundWidth - scrollPaperWidth, scrollPaperHeight);
-  })();
-  (function renderTitle() {
-    var initialX = workingAreaPoints[0];
-    var initialY = workingAreaPoints[1];
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-    ctx.font = '16px PT Mono';
-    ctx.fillText('Ура вы победили!', initialX + 110, initialY + 20);
-    ctx.fillText('Список результатов:', initialX + 90, initialY + 44);
-
-    workingAreaPoints[1] += 60;
-  })();
-  (function renderHistogram() {
-    var histogramHeight = 150;
-    var maxTime = Math.round(times.slice().sort(function (a, b) {
-      return a - b;
-    })[times.length - 1]);
-    var step = histogramHeight / maxTime;
-    var barWidth = 40;
-    var indent = 50;
-    var lineHeight = 20;
-    var initialX = (workingAreaPoints[2] - workingAreaPoints[0] - (barWidth * names.length + indent * (names.length - 1))) / 2 + workingAreaPoints[0];
-    var initialY = workingAreaPoints[1];
-
-    for (var i = 0; i < times.length; i++) {
-      ctx.font = '14px PT Mono';
-      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-      ctx.fillText(Math.round(times[i]), initialX + (indent + barWidth) * i + 5, initialY + lineHeight + (150 - times[i] * step) - 10);
-      ctx.fillStyle = names[i] === 'Вы' ? 'rgba(0, 0, 255, 1)' : 'rgba(0, 0, 255, ' + Math.random().toFixed(2) + ')';
-      ctx.fillRect(initialX + (indent + barWidth) * i, initialY + lineHeight + (150 - times[i] * step), barWidth, times[i] * step);
-      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-      ctx.font = '16px PT Mono';
-      ctx.fillText(names[i], initialX + (indent + barWidth) * i + 5, initialY + histogramHeight + lineHeight * 2);
-    }
-  })();
+var getMaxNumber = function (arr) {
+  return Math.max.apply(null, arr);
 };
 
+var getRandomColor = function (red, green, blue, opacity) {
+  red = red || Math.floor(Math.random() * 256);
+  green = green || Math.floor(Math.random() * 256);
+  blue = blue || Math.floor(Math.random() * 256);
+  opacity = opacity || Math.ceil((Math.random() * 0.9 + 0.1) * 100) / 100;
+  return 'rgba(' + red + ', ' + green + ', ' + blue + ', ' + opacity + ')';
+};
+
+window.renderStatistics = function (ctx, names, times) {
+  var background = {
+    initialX: 100,
+    initialY: 10,
+    height: 270,
+    width: 420,
+    shadowOffset: 10,
+    shadowColor: 'rgba(0, 0, 0, 0.7)',
+    scroll: {
+      wood: {
+        height: 5,
+        width: 40
+      },
+      paper: {
+        width: 60
+      },
+      list: {
+        color: 'rgba(255, 255, 255, 1)'
+      }
+    }
+  };
+  background.scroll.paper.height = background.height - background.scroll.wood.height * 2;
+  background.scroll.paper.color = ctx.createLinearGradient(background.initialX, background.initialY, background.initialX + background.scroll.paper.width, background.initialY);
+  background.scroll.paper.color.addColorStop(0, 'gray');
+  background.scroll.paper.color.addColorStop(0.3, 'rgba(255, 255, 255, 1)');
+  background.scroll.paper.color.addColorStop(0.35, 'rgba(255, 255, 255, 1)');
+  background.scroll.paper.color.addColorStop(0.8, 'gray');
+  background.scroll.paper.color.addColorStop(1, 'black');
+  background.scroll.wood.offset = (background.scroll.paper.width - background.scroll.wood.width) / 2;
+  background.scroll.wood.color = ctx.createLinearGradient(background.initialX + background.scroll.wood.offset, background.initialY, background.initialX + background.scroll.wood.offset + background.scroll.wood.width, background.initialY);
+  background.scroll.wood.color.addColorStop(0, 'rgba(77, 31, 6, 1)');
+  background.scroll.wood.color.addColorStop(0.35, 'rgba(140, 52, 19, 1)');
+  background.scroll.wood.color.addColorStop(0.4, 'rgba(140, 52, 19, 1)');
+  background.scroll.wood.color.addColorStop(1, 'rgba(77, 31, 6, 1)');
+  var title = {
+    initialX: background.initialX + background.scroll.paper.width,
+    initialY: background.initialY + background.scroll.wood.height,
+    height: 60,
+    color: 'rgba(0, 0, 0, 1)',
+    font: '16px PT Mono',
+    lineOneText: 'Ура вы победили!',
+    lineOneOffsetX: 110,
+    lineOneOffsetY: 25,
+    lineTwoText: 'Список результатов:',
+    lineTwoOffsetX: 90,
+    lineTwoOffsetY: 49
+  };
+  var histogram = {
+    initialY: background.initialY + background.scroll.wood.height + title.height,
+    height: 150,
+    textFont: '16px PT Mono',
+    textColor: 'rgba(0, 0, 0, 1)',
+    textLineHeight: 20,
+    textOffsetX: 5,
+    textOffsetY: 10,
+    barWidth: 40,
+    indent: 50,
+    userBarColor: 'rgba(255, 0, 0, 1)'
+  };
+  histogram.initialX = background.initialX + background.scroll.paper.width + (background.width - background.scroll.paper.width - histogram.barWidth * names.length - histogram.indent * (names.length - 1)) / 2;
+  histogram.stepY = histogram.height / getMaxNumber(times);
+  histogram.stepX = histogram.barWidth + histogram.indent;
+  histogram.drawBar = function (value, i) {
+    ctx.font = histogram.textFont;
+    ctx.fillStyle = histogram.textColor;
+    ctx.fillText(Math.round(value).toString(10), histogram.initialX + histogram.stepX * i, histogram.initialY + histogram.textLineHeight + (histogram.height - value * histogram.stepY) - histogram.textOffsetY);
+    ctx.fillStyle = names[i] === 'Вы' ? histogram.userBarColor : getRandomColor('0', '0', '255');
+    ctx.fillRect(histogram.initialX + histogram.stepX * i, histogram.initialY + histogram.textLineHeight + (histogram.height - value * histogram.stepY), histogram.barWidth, value * histogram.stepY);
+    ctx.fillStyle = histogram.textColor;
+    ctx.font = histogram.textColor;
+    ctx.fillText(names[i], histogram.initialX + histogram.stepX * i + histogram.textOffsetX, histogram.initialY + histogram.height + histogram.textLineHeight * 2);
+  };
+
+  ctx.fillStyle = background.shadowColor;
+  ctx.fillRect(background.initialX + background.shadowOffset, background.initialY + background.scroll.wood.height + background.shadowOffset, background.width, background.scroll.paper.height);
+  ctx.fillRect(background.initialX + background.scroll.wood.offset + background.shadowOffset, background.initialY + background.scroll.paper.height + background.scroll.wood.height + background.shadowOffset, background.scroll.wood.width, background.scroll.wood.height);
+
+  ctx.fillStyle = background.scroll.wood.color;
+  ctx.strokeRect(background.initialX + background.scroll.wood.offset, background.initialY, background.scroll.wood.width, background.scroll.wood.height);
+  ctx.strokeRect(background.initialX + background.scroll.wood.offset, background.initialY + background.scroll.paper.height + background.scroll.wood.height, background.scroll.wood.width, background.scroll.wood.height);
+  ctx.fillRect(background.initialX + background.scroll.wood.offset, background.initialY, background.scroll.wood.width, background.scroll.wood.height);
+  ctx.fillRect(background.initialX + background.scroll.wood.offset, background.initialY + background.scroll.paper.height + background.scroll.wood.height, background.scroll.wood.width, background.scroll.wood.height);
+
+  ctx.fillStyle = background.scroll.paper.color;
+  ctx.strokeRect(background.initialX, background.initialY + background.scroll.wood.height, background.width, background.scroll.paper.height);
+  ctx.fillRect(background.initialX, background.initialY + background.scroll.wood.height, background.scroll.paper.width, background.scroll.paper.height);
+
+  ctx.fillStyle = background.scroll.list.color;
+  ctx.fillRect(background.initialX + background.scroll.paper.width, background.initialY + background.scroll.wood.height, background.width - background.scroll.paper.width, background.scroll.paper.height);
+
+  ctx.fillStyle = title.color;
+  ctx.font = title.font;
+  ctx.fillText(title.lineOneText, title.initialX + title.lineOneOffsetX, title.initialY + title.lineOneOffsetY);
+  ctx.fillText(title.lineTwoText, title.initialX + title.lineTwoOffsetX, title.initialY + title.lineTwoOffsetY);
+
+  times.forEach(histogram.drawBar);
+};
