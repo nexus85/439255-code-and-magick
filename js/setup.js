@@ -22,7 +22,7 @@ var RandomWizard = function () {
   this.coatColor = getRandomElement(COAT_COLORS);
   this.eyesColor = getRandomElement(EYES_COLORS);
 };
-var getRandomWizards = function(amount) {
+var getRandomWizards = function (amount) {
   var wizards = [];
   while (amount-- > 0) {
     wizards.push(new RandomWizard());
@@ -38,7 +38,7 @@ var renderWizard = function (wizard) {
 };
 var getFragment = function (data, renderMethod) {
   var fragment = document.createDocumentFragment();
-  data.forEach(function(item) {
+  data.forEach(function (item) {
     fragment.appendChild(renderMethod(item));
   });
   return fragment;
