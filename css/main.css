@@ -870,3 +870,8 @@ input[type=radio]:checked + .review-mark-label {
   left: 0;
   top: 0;
 }
+
+use:focus {
+  stroke-dasharray: 1;
+  stroke: rgba(255, 240, 0, 0.8);
+}
