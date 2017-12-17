@@ -40,6 +40,7 @@
   });
   window.elements.artifactsElement.addEventListener('dragend', function (evt) {
     evt.target.parentElement.removeChild(draggedItem);
+    window.elements.artifactsElement.removeAttribute('style');
     evt.preventDefault();
   });
 })();
