@@ -16,6 +16,10 @@
     setupFireballWrap: document.querySelector('.setup-fireball-wrap'),
     wizardCoatInput: document.querySelector('input[name="coat-color"]'),
     wizardEyesInput: document.querySelector('input[name="eyes-color"]'),
-    setupFireballInput: document.querySelector('input[name="fireball-color"]')
+    setupFireballInput: document.querySelector('input[name="fireball-color"]'),
+    dialogHandle: userDialog.querySelector('.setup-user-pic'),
+    dialogAvatarInput: userDialog.querySelector('[name = "avatar"]'),
+    shopElement: userDialog.querySelector('.setup-artifacts-shop'),
+    artifactsElement: userDialog.querySelector('.setup-artifacts')
   };
 })();
