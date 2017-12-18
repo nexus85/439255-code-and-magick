@@ -1,7 +1,61 @@
 'use strict';
 (function () {
+  var initialCoords = {
+  };
+  var avatarEnterPressHandler = function (evt) {
+    if (evt.keyCode === window.settings.KeyCode.ENTER) {
+      window.elements.dialogAvatarInput.click();
+    }
+  };
+  var mouseDownHandler = function (evt) {
+    if (evt.target === window.elements.dialogHandle) {
+      evt.preventDefault();
+      var startCoords = {
+        x: evt.clientX,
+        y: evt.clientY
+      };
+      var isMoved = false;
+      var mouseMoveHandler = function (moveEvt) {
+        moveEvt.preventDefault();
+        isMoved = true;
+        var shift = {
+          x: startCoords.x - moveEvt.clientX,
+          y: startCoords.y - moveEvt.clientY
+        };
+
+        startCoords = {
+          x: moveEvt.clientX,
+          y: moveEvt.clientY
+        };
+
+        window.elements.userDialog.style.top = (window.elements.userDialog.offsetTop - shift.y) + 'px';
+        window.elements.userDialog.style.left = (window.elements.userDialog.offsetLeft - shift.x) + 'px';
+      };
+      var mouseUpHandler = function (upEvt) {
+        upEvt.preventDefault();
+
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        if (!isMoved) {
+          window.elements.dialogAvatarInput.click();
+        }
+      };
+      document.addEventListener('mousemove', mouseMoveHandler);
+      document.addEventListener('mouseup', mouseUpHandler);
+    }
+  };
   var openPopup = function () {
+    window.elements.dialogAvatarInput.style.zIndex = '-1';
+    if (initialCoords.y !== window.elements.userDialog.style.top ||
+        initialCoords.x !== window.elements.userDialog.style.left) {
+      window.elements.userDialog.style.top = initialCoords.y + 'px';
+      window.elements.userDialog.style.left = initialCoords.x + 'px';
+    }
     window.elements.userDialog.classList.remove('hidden');
+    if (initialCoords.x !== null && initialCoords.y !== null) {
+      initialCoords.x = window.elements.userDialog.offsetLeft;
+      initialCoords.y = window.elements.userDialog.offsetTop;
+    }
     document.addEventListener('keydown', popupEscPressHandler);
     window.util.setListeners(window.elements.userNameInput, 'add', ['invalid', 'input'],
         [inputInvalidHandler, inputInputHandler]);
@@ -19,10 +73,10 @@
   };
 
   var popupOpenButtonClickHandler = window.util.getClickHandler(openPopup);
-  var popupOpenButtonEnterPressHandler = window.util.getKeydownHandler(window.settings.KeyCodes.ENTER, openPopup);
+  var popupOpenButtonEnterPressHandler = window.util.getKeydownHandler(window.settings.KeyCode.ENTER, openPopup);
   var popupCloseButtonClickHandler = window.util.getClickHandler(closePopup);
-  var popupCloseButtonEnterPressHandler = window.util.getKeydownHandler(window.settings.KeyCodes.ENTER, closePopup);
-  var popupEscPressHandler = window.util.getKeydownHandler(window.settings.KeyCodes.ESC, closePopup);
+  var popupCloseButtonEnterPressHandler = window.util.getKeydownHandler(window.settings.KeyCode.ENTER, closePopup);
+  var popupEscPressHandler = window.util.getKeydownHandler(window.settings.KeyCode.ESC, closePopup);
   var inputInvalidHandler = function (evt) {
     window.util.setListeners(window.elements.userDialogSave, 'remove', ['click', 'keydown'],
         [popupCloseButtonClickHandler, popupCloseButtonEnterPressHandler]);
@@ -63,10 +117,12 @@
     }
   };
   var wizardKeydownHandler = function (evt) {
-    if (evt.keyCode === window.settings.KeyCodes.ENTER || evt.keyCode === window.settings.KeyCodes.SPACE) {
+    if (evt.keyCode === window.settings.KeyCode.ENTER || evt.keyCode === window.settings.KeyCode.SPACE) {
       wizardClickHandler(evt);
     }
   };
+  window.elements.userDialog.addEventListener('mousedown', mouseDownHandler);
+  window.elements.dialogHandle.addEventListener('keydown', avatarEnterPressHandler);
   window.util.setListeners(window.elements.userDialogOpen, 'add', ['click', 'keydown'],
       [popupOpenButtonClickHandler, popupOpenButtonEnterPressHandler]);
   window.util.setListeners(window.elements.userDialogClose, 'add', ['click', 'keydown'],
