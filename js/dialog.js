@@ -104,16 +104,22 @@
           [popupCloseButtonClickHandler, popupCloseButtonEnterPressHandler]);
     }
   };
+  var changeCoatColor = window.colorize.colorizeElement(window.elements.setupWizardCoat,
+      window.settings.Wizard.COAT_COLORS, window.colorize.setFillColor);
+  var changeEyesColor = window.colorize.colorizeElement(window.elements.setupWizardEyes,
+      window.settings.Wizard.EYES_COLORS, window.colorize.setFillColor);
+  var changeFireballColor = window.colorize.colorizeElement(window.elements.setupFireballWrap,
+      window.settings.Wizard.FIREBALL_COLORS, window.colorize.setBackgroundColor);
   var wizardClickHandler = function (evt) {
     if (evt.target === window.elements.setupWizardCoat) {
-      window.colorize.changeCoatColor();
+      changeCoatColor();
     }
     if (evt.target === window.elements.setupWizardEyes) {
-      window.colorize.changeEyesColor();
+      changeEyesColor();
     }
     if (evt.target === window.elements.setupFireballWrap
         || evt.target === window.elements.setupFireballWrap.children[0]) {
-      window.colorize.changeFireballColor();
+      changeFireballColor();
     }
   };
   var wizardKeydownHandler = function (evt) {
