@@ -11,6 +11,7 @@
       ESC: 27,
       ENTER: 13,
       SPACE: 32
-    }
+    },
+    SIMILAR_WIZARDS_AMOUNT: 4
   };
 })();
