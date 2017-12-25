@@ -29,10 +29,8 @@
       var wizardsInfo = sortWizards();
       wizardsInfo.length = num;
       var fragment = window.util.getFragment(wizardsInfo, window.util.renderWizard);
-      if (window.element.similarList.children.length) {
-        while (window.element.similarList.children.length) {
-          window.element.similarList.removeChild(window.element.similarList.children[0]);
-        }
+      while (window.element.similarList.children.length) {
+        window.element.similarList.removeChild(window.element.similarList.children[0]);
       }
       window.element.similarList.appendChild(fragment);
       window.element.userDialog.querySelector('.setup-similar').classList.remove('hidden');
