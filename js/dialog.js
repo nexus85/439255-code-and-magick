@@ -109,17 +109,23 @@
     }
   };
   var changeCoatColor = window.colorize.colorizeElement(window.element.setupWizardCoat,
-      window.settings.Wizard.COAT_COLORS, window.colorize.setFillColor);
+      window.settings.Wizard.COAT_COLORS, window.colorize.setFillColor, 'CURRENT_COAT_COLOR');
   var changeEyesColor = window.colorize.colorizeElement(window.element.setupWizardEyes,
-      window.settings.Wizard.EYES_COLORS, window.colorize.setFillColor);
+      window.settings.Wizard.EYES_COLORS, window.colorize.setFillColor, 'CURRENT_EYES_COLOR');
   var changeFireballColor = window.colorize.colorizeElement(window.element.setupFireballWrap,
       window.settings.Wizard.FIREBALL_COLORS, window.colorize.setBackgroundColor);
   var wizardClickHandler = function (evt) {
     if (evt.target === window.element.setupWizardCoat) {
       changeCoatColor();
+      window.debounce(function () {
+        window.similarWizards.show(window.settings.SIMILAR_WIZARDS_AMOUNT);
+      });
     }
     if (evt.target === window.element.setupWizardEyes) {
       changeEyesColor();
+      window.debounce(function () {
+        window.similarWizards.show(window.settings.SIMILAR_WIZARDS_AMOUNT);
+      });
     }
     if (evt.target === window.element.setupFireballWrap
         || evt.target === window.element.setupFireballWrap.children[0]) {
@@ -132,11 +138,12 @@
     }
   };
   var successHandler = function () {
-    window.message.show('Успех', 'Ваш волшебник успешно добавлен в базу', window.message.Color.SUCCESS, 3000);
+    window.message.show('Успех', 'Ваш волшебник успешно добавлен в базу',
+        window.message.Color.SUCCESS, window.settings.MESSAGE_SHOW_TIME);
     window.element.userDialog.classList.add('hidden');
   };
   var errorHandler = function (error) {
-    window.message.show('Ошибка', error, window.message.Color.ERROR, 3000);
+    window.message.show('Ошибка', error, window.message.Color.ERROR, window.settings.MESSAGE_SHOW_TIME);
   };
   var formSubmitHandler = function (evt) {
     window.backend.save(new FormData(window.element.userDialogForm), successHandler, errorHandler);
