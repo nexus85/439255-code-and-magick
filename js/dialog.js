@@ -8,7 +8,7 @@
     }
   };
   var mouseDownHandler = function (evt) {
-    if (evt.target === window.element.dialogHandle) {
+    if (evt.target === window.element.dialogAvatarInput) {
       evt.preventDefault();
       var startCoords = {
         x: evt.clientX,
@@ -17,12 +17,14 @@
       var isMoved = false;
       var mouseMoveHandler = function (moveEvt) {
         moveEvt.preventDefault();
-        isMoved = true;
+
         var shift = {
           x: startCoords.x - moveEvt.clientX,
           y: startCoords.y - moveEvt.clientY
         };
-
+        if (shift.x > 1 || shift.y > 1) {
+          isMoved = true;
+        }
         startCoords = {
           x: moveEvt.clientX,
           y: moveEvt.clientY
@@ -33,11 +35,14 @@
       };
       var mouseUpHandler = function (upEvt) {
         upEvt.preventDefault();
-
         document.removeEventListener('mousemove', mouseMoveHandler);
         document.removeEventListener('mouseup', mouseUpHandler);
-        if (!isMoved) {
-          window.element.dialogAvatarInput.click();
+        if (isMoved) {
+          var clickPreventDefaultHandler = function (clickEvt) {
+            clickEvt.preventDefault();
+            window.element.dialogAvatarInput.removeEventListener('click', clickPreventDefaultHandler);
+          };
+          window.element.dialogAvatarInput.addEventListener('click', clickPreventDefaultHandler);
         }
       };
       document.addEventListener('mousemove', mouseMoveHandler);
@@ -49,7 +54,6 @@
       window.similarWizards.load();
       window.similarWizards.show(window.settings.SIMILAR_WIZARDS_AMOUNT);
     }
-    window.element.dialogAvatarInput.style.zIndex = '-1';
     if (initialCoords.y !== window.element.userDialog.style.top ||
         initialCoords.x !== window.element.userDialog.style.left) {
       window.element.userDialog.style.top = initialCoords.y + 'px';
